@@ -75,8 +75,8 @@ qplot(chill, cp, color = days, data = dat,
 chillportions <- vector()
 numdays <- vector()
 
-chilltreat = c(1, 4, 8)
-timetreat = c(15, 30)
+chilltreat = c(1, 2, 4, 10)
+timetreat = c(1, 15, 30)
 
 for(i in chilltreat){
 	for(j in timetreat){
