@@ -4,18 +4,18 @@
 # 6 species
 # 12 reps / species / level
 # 2 time points after control
-3 * 6* 12 * 2
-6 * 12 
+4 * 6 * 8 * 3 + 4 * 4 * 3
 
-chilltreat = c(1.5, 2.5, 5)
 
-timetreat = c(20, 35)
+chilltreat = c(1, 2, 4, 8)
 
-spp = c("acesac", "acerub", "querub","hamvir","vibcas","franig")
+timetreat = c(1, 15, 30)
+
+spp = c("acesac", "querub","hamvir","vibcas","faggra", "ilemuc")
 
 chillev = length(chilltreat)
 spno = length(spp)
-repno = 12
+repno = 8
 timeno = length(timetreat)
 lengthout = chillev*spno*repno*timeno 
 
@@ -75,8 +75,8 @@ qplot(chill, cp, color = days, data = dat,
 chillportions <- vector()
 numdays <- vector()
 
-chilltreat = c(1, 2, 4, 10)
-timetreat = c(1, 15, 30)
+chilltreat = c(1, 2, 4, 8)
+timetreat = c(10, 20)
 
 for(i in chilltreat){
 	for(j in timetreat){
@@ -96,4 +96,5 @@ library(ggplot2)
 
 qplot(chill, cp, color = days, data = dat, 
 	ylab = "Chill Portions \n (Dynamic Model)", 
-	xlab = "Chilling Treatment (°C)")
+	xlab = "Chilling Treatment (°C)",
+	ylim = c(0, 25))
