@@ -47,7 +47,7 @@ chilling(ht2, 305, 60) # 35 chill portions as of Dec 23.
 diff(as.POSIXlt(c("2015-12-23", "2016-01-01"), "%Y-%m-%d"))
 
 dayseq = seq(as.numeric(format(as.POSIXlt("2016-01-01", "%Y-%m-%d"), "%j")),
-             as.numeric(format(as.POSIXlt("2016-01-31", "%Y-%m-%d"), "%j")))
+             as.numeric(format(as.POSIXlt("2016-01-16", "%Y-%m-%d"), "%j")))
 
 # First seven days at 4 deg
 dayseq = 1:7
@@ -61,6 +61,23 @@ chill1 <- data.frame(
 
 # bug: Jday vs JDay, returns error for "chillout not found"
 
-chilling(chill1, 305, 60)
 
-function
+allfridge <- chilling(chill1, 305, 60)
+
+# Natural chilling 35 portions, 625 h, 675 Utah.
+naturalchill <- chilling(ht2, 305, 60) # 35 chill portions as of Dec 23.
+
+# chill 
+chillcalc <- function(temp, days){
+  dayseq = 1:days
+  chillx <- data.frame(
+    Year = as.numeric(rep("2016", length(dayseq)*24)),
+    JDay = as.numeric(rep(dayseq, each = 24)),
+    Hour = as.numeric(rep(0:23, each = length(dayseq))),
+    Temp = temp
+    )
+  chilling(chillx, 305, 60)
+}
+
+
+
