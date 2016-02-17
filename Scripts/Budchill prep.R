@@ -1,5 +1,7 @@
 # Budchill analyses
 library(scales)
+library(chillR)
+library(ggplot2)
 
 setwd("~/Documents/git/budchill")
 
@@ -20,9 +22,6 @@ d$day3 <- day1 - as.numeric(format(strptime("2015-02-01", "%Y-%m-%d"), "%j")) + 
 d$day <- ifelse(d$time == "time1", d$day1, ifelse(d$time == "time2", d$day2, d$day3))
 
 # Calculate actual chill units
-
-library(chillR)
-
 # chill unit calcs, for each treatment
 
 chillcalc <- function(days, temp){
