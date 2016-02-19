@@ -13,10 +13,7 @@ print(toload <- sort(dir("./input")[grep("Budburst Chill Data", dir('./input'))]
 
 load(file.path("input", toload))
 
-# 
-
 # Initial analysis: by experimental treatment
-
 # convert chill and time to numerics for ordered analysis
 
 dx$chilltemp = as.numeric(substr(as.character(dx$chill), 6, 6))
@@ -30,7 +27,7 @@ sjp.lmer(m1, type = 'fe')
 ########### USE THIS #################
 # only run for species which have > 25% budburst
 
-keepsp <- table(dx$nl, dx$sp)[2,] / table(dx$sp) > 0.25
+keepsp <- table(dx$nl, dx$sp)[2,] / table(dx$sp) > 0.25 # now three species
 
 m2 <- lmer(bday ~ (chilltemp*timetreat|sp/ind), data = dx[dx$sp %in% names(keepsp)[keepsp==T],] )
 summary(m2)
@@ -53,7 +50,7 @@ ses <- aggregate(dx$bday, list(dx$chilltemp, dx$timetreat, dx$sp), function(x) s
 datx <- data.frame(means, se=ses$x)
 
 
-ggplot(datx, aes(time, x, group = chill)) + geom_line(aes(color=chill)) + facet_grid(.~sp) + ylab('Day of budburst') + xlab('Chilling time')
+ggplot(datx, aes(time, x, group = chill)) + geom_line(aes(color=chill), lwd = 2) + facet_grid(.~sp) + ylab('Day of budburst') + xlab('Chilling time')
 
 
 m3 <- lmer(bday ~ chillport + chilltemp * timetreat + (1|sp), data = dx)
@@ -66,7 +63,7 @@ m4 <- lmer(bday ~ chillport * chilltemp * timetreat + (1|sp), data = dx)
 summary(m4)
 sjp.lmer(m3, type = 'fe')
 
-AIC(m1,m3)
+AIC(m1,m3,m4)
 
 # no, calculated chill portions at least by AIC are not as good as chill temp timetreat
 m5 <- lmer(bday ~ chillport  + (1|sp/ind), data = dx)
