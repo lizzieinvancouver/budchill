@@ -167,7 +167,7 @@ for(spx in levels(d$sp)){ # spx = "BETALL"
   counter = 1
   for(i in sort(as.character((unique(dx$time))))){# i = "time1"
     
-    dseq = seq(0, max(dx$day))
+    dseq = seq(0, max(dxx$day))
     plot(dseq, seq(0, 7,length=length(dseq)), type = "n", 
          ylab = "Stage",
          xlab = "")
