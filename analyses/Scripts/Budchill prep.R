@@ -146,7 +146,6 @@ save(list = c('d', 'dx','chillcalcs'), file = paste("input/Budburst Chill Data "
 
 # For each species, make trace plots
 
-
 # re-sort to make sure ordered by date correctly
 d <- d[order(d$Date, d$id, d$Treat),]
 
@@ -206,18 +205,8 @@ system(paste("open '", paste("figures/Trace Plots ", Sys.Date(), ".pdf", sep="")
 
 
 ### Also plot by chill portions
-
-ggplot(dx, aes(chillport, bday)) + geom_point(aes(color = sp)) + geom_smooth(method="lm")
-
-ggplot(dx, aes(jitter(chillport, 5), jitter(bday, 5), group = sp)) + geom_point(aes(color = sp)) + 
-    xlab("Chill Portions") + ylab("Day of Budburst") + ylim(0, 40)#+ geom_smooth(method="lm", level = 0.5)
+ggplot(dx, aes(jitter(chillport, 3), jitter(bday, 3), color = sp)) + geom_point(aes(color = sp)) + geom_smooth(aes(group = sp), method="lm") + xlab("Chill Portions") + ylab("Day of Budburst") 
 
 dev.print(pdf, "figures/Budburst x Chill Port.pdf", width = 6, height = 5)
 system(paste("open 'figures/Budburst x Chill Port.pdf' -a /Applications/Preview.app", sep=""))
 
-
-ggplot(dx, aes(jitter(chillport, 5), jitter(lday, 5), group = sp)) + geom_point(aes(color = sp)) + 
-  xlab("Chill Portions") + ylab("Day of Leafout") + ylim(0, 40)##+ geom_smooth(method="lm", level = 0.5)
-
-dev.print(pdf, "figures/Leafout x Chill Port.pdf", width = 6, height = 5)
-system(paste("open 'figures/Leafout x Chill Port.pdf' -a /Applications/Preview.app", sep=""))
