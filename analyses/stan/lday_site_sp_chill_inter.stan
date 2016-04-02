@@ -1,21 +1,17 @@
 
-// Stan model following Meetup 2016-03-28
-// Now with chilling levels as dummy variables for each level, two levels
-// Including site as intercept
-// If also include species intercept, total failure; model cannot decide which intercept to use..
-// Leafout day as a function of species and site of origin as modeled group level factors, and temperature, photoperiod, and chilling as unmodeled factors (experimental manipulation)
+// budchill version of interaction model
 
 data {
   int<lower=0> N;
   int<lower=0> n_sp;
-  int<lower=0> n_site;
   int<lower=1, upper=n_sp> sp[N];
   vector[N] lday;
-  vector[N] warm;
-  vector[N] photo;
   vector[N] chill1; 
   vector[N] chill2;
-  vector[N] site;
+  vector[N] chill4;
+  vector[N] chill8;
+  vector[N] time2;
+  vector[N] time3;
 }
 
 transformed data { 			// 9 interaction terms

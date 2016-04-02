@@ -4,11 +4,15 @@ library(scales)
 library(arm)
 library(rstan)
 library(sjPlot)
+library(shinystan)
+
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
 
 rm(list=ls())
 
 setwd("~/Documents/git/budchill/analyses")
-
+source('stan/savestan.R')
 print(toload <- sort(dir("./input")[grep("Budburst Chill Data", dir('./input'))], T)[1])
 
 load(file.path("input", toload))
@@ -76,4 +80,43 @@ summary(m6)
 
 ######### Stan.
 
+# make dummy vars. Can we do 4 levels of chill treatment without a 'reference' level? More in the spirit of Bayesian..
+# now doing with chill1 as reference.
+dx$chill1 = ifelse(dx$chill == "chill1", 1, 0) 
+dx$chill2 = ifelse(dx$chill == "chill2", 1, 0) 
+dx$chill4 = ifelse(dx$chill == "chill4", 1, 0) 
+dx$chill8 = ifelse(dx$chill == "chill8", 1, 0) 
+dx$time2 = ifelse(dx$time == "time2", 1, 0) 
+dx$time3 = ifelse(dx$time == "time3", 1, 0) 
 
+with(dx, table(time2, time3))
+
+with(dx, table(chill1, chill2))
+with(dx, table(chill4, chill8))
+
+dxb <- dx[!is.na(dx$bday),] # ignore those which failed to burst bud
+
+datalist.b <- list(lday = dxb$bday, # budburst as respose 
+                  sp = as.numeric(dxb$sp), 
+                  chill1 = as.numeric(dxb$chill1),
+                  chill2 = as.numeric(dxb$chill2),
+                  chill4 = as.numeric(dxb$chill4),
+                  chill8 = as.numeric(dxb$chill8),
+                  time2 = as.numeric(dxb$time2),
+                  time3 = as.numeric(dxb$time3),
+                   N = nrow(dxb), 
+                   n_sp = length(unique(dxb$sp))
+)
+
+  doym.b <- stan('stan/chill_time_sp1.stan', 
+                 data = datalist.b, iter = 5005, chains = 4,
+                 control = list(adapt_delta = 0.9,
+                                max_treedepth = 15))
+
+# 266 divergences with all 4 levels, still 128 divergences with 3-level version
+  sumerb <- summary(doym.b)$summary
+  sumerb[grep("mu_", rownames(sumerb)),]
+  
+  ssm.b <- as.shinystan(doym.b)
+  # launch_shinystan(ssm.b) 
+savestan("Chill1 bud")
