@@ -1,0 +1,158 @@
+\documentclass{article}
+
+\usepackage{textcomp}
+\usepackage{fontenc}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{gensymb} % for \degree
+\usepackage{placeins} % for \images
+\usepackage[margin=1in]{geometry} % to set margins
+\usepackage{cite} % for bibtex
+\usepackage{subfigure} % for figures arranged in a grid
+\usepackage{float} % to put captions on top
+\usepackage{longtable} % for multi-page table
+\usepackage{pdflscape} % for individual pages in landscape format
+
+\floatstyle{plaintop}
+\restylefloat{figure}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\renewcommand{\thesubfigure}{}
+
+\setlength{\parskip}{2 mm}
+
+\begin{document}
+
+\SweaveOpts{concordance=TRUE}
+
+\flushleft
+
+\textbf{\huge{A standardized photographic guide to woody plant spring phenology}}
+
+Savas, Flynn, Wolkovich
+
+\textit{The Arnold Arboretum of Harvard University}
+
+%%%%% Summary text
+
+\section*{Summary}
+
+This guide shows spring phenology stages from 28 woody plant species from eastern North America.
+
+Problem: different groups measure phenology different ways. First date of leaf out is often used for cross-study comparisons, but even assessing what is "leaf out" is not straight forward. Project Budburst of the National Phenology Network, an intiatitave of academic and governmental agencies in the United States (https://www.usanpn.org), uses a scale based on both date and intensity of bud burst, leaf out, flowerering and senescence. The measures of intensity may be challenging to assess. 
+
+Solution: BBCH for woody plants.
+
+This guide facilitates the use of the BBCH scale for woody plants. The BBCH (Biologische Bundesanstalt, Bundessortenamt, Chemische Industrie) was developed byt the German federal agencies of Biological Research Centre for Agriculture and Forestry, the Federal Office of Plant Varieties, and the Federal Office of Chemical Industry, and uses a numeric scale to quantify phenophases for many kinds of plants and animals. An extended BBCH scale for woody plants \cite{Finn:2007} was developed to expand the BBCH approach beyond crop species, and serves as the bases for this guide.
+
+The use of the BBCH scale as a standardized measure of phenological stages has facilitated cross-species analysis of how phenology tracks climate at the continental scale \cite{Menzel:2006}. 
+
+List of species...
+
+\section*{Comparison of different phenological stages}
+
+This table compares the BBCH and NPN phenostages.
+
+<<echo=FALSE, results = tex>>=
+setwd("~/Documents/git/budchill/BBCHGuide/scale demo")
+#setwd("/Volumes/WeldShare/Wolkovich Lab/Protocols/BBCH Guide/scale demo")
+library(xtable)
+
+tab <- read.csv("BBCH to NPN.csv", stringsAsFactors = F)
+
+tab <- tab[c(1:4)] #5,7)] # if adding species
+names(tab)[1:4] <- c("BBCH Stage", "BBCH Description",
+                "NPN Stage", "NPN Description")
+#names(tab)[5:6] <- sub("\\.", " ", names(tab)[5:6])
+tab <- tab[-1,]
+
+
+# Some options are specified when making the table using xtable
+  
+xtb <-xtable(tab, type = "latex",
+      caption = "BBCH and NPN phenostage scales",
+      width = 15,
+      align= c("p{00\\textwidth}", "p{0.2\\textwidth}", "p{0.3\\textwidth}|", "p{0.2\\textwidth}", "p{0.3\\textwidth}")#, "p{0.3\\textwidth}", "p{0.3\\textwidth}"),
+    )
+
+# Other options need to be specified when displaying the table using print
+cat("\\begin{landscape}
+\\setlength\\LTcapwidth{\\textwidth} 
+\\setlength\\LTleft{0pt}            
+\\setlength\\LTright{0pt}")
+print(xtb, 
+      floating = FALSE,
+      include.rownames=FALSE, 
+      tabular.environment='longtable',   
+      caption.placement = "top",
+      size = "footnotesize" # try "tiny" or "small"
+      )
+cat("\\end{landscape}")
+
+@
+
+\newpage
+
+\section*{Photographic guide to BBCH stages}
+
+%%%%% Look in the directory with species photos in it, extract photos, format into a guide book.
+
+<<echo=FALSE, results = tex>>=
+setwd("~/Documents/git/budchill/BBCHGuide/scale demo")
+
+source("BBCHunderscores.R")
+
+sp <- dir()[grep("BBCH", dir(), invert = TRUE)]
+
+# Loop over species. Generate latex code for a formatted grid of images
+for(i in sp){ # i = sp[1]
+  underscores(i)
+  
+  # Get sp name
+  spname <- sub("_", " ", strsplit(dir(i), ",")[[1]][1])
+
+  # get the stages
+  stages <- unlist(lapply(strsplit(dir(i), ","), function(x)
+                    x[2]))
+  
+  # find two numeric characters preceding a period
+  stages <- unlist(regmatches(stages, gregexpr("[0-9]{2}", stages)))
+  # Strip leading zeros
+  stages <- sort(gsub("^[0]", "", stages))
+
+  # Start figures
+  
+  figstart <- "\\begin{figure}[ht]\\centering\\hfill"
+  
+  subfigs <- vector()
+  
+  for(j in 1:length(dir(i)) ) {
+      phot <- dir(i)[j]
+        
+        subx <- paste("\\subfigure[", paste("Stage", stages[j]),"]{
+                \\includegraphics[width = 7cm]{", paste(i, phot, sep = "/"),"}}
+              \\hfill", sep = "")
+        subfigs <- c(subfigs, subx)
+      
+      }
+  
+  figend <- paste("\\caption{\\textit{", spname,"}}\\end{figure}\\newpage
+", sep="")
+  
+  cat(figstart, subfigs, figend)
+
+  }
+
+
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{References Cited}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliography{BBCH}
+\bibliographystyle{naturemag}
+
+\end{document}

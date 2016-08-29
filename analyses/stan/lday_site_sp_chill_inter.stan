@@ -14,7 +14,7 @@ data {
   vector[N] time3;
 }
 
-transformed data { 			// 9 interaction terms
+transformed data { 			// interaction terms: each chill x each time. 
   vector[N] inter_wp;           
   vector[N] inter_ws;           
   vector[N] inter_ps;           

@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem{Finn:2007}
+\bibinfo{author}{Finn, G.~A.}, \bibinfo{author}{Straszewski, A.~E.} \&
+  \bibinfo{author}{Peterson, V.}
+\newblock \bibinfo{title}{A general growth stage key for describing trees and
+  woody plants}.
+\newblock \emph{\bibinfo{journal}{Annals of Applied Biology}}
+  \textbf{\bibinfo{volume}{151}}, \bibinfo{pages}{127--131}
+  (\bibinfo{year}{2007}).
+
+\bibitem{Menzel:2006}
+\bibinfo{author}{Menzel, A.} \emph{et~al.}
+\newblock \bibinfo{title}{European phenological response to climate change
+  matches the warming pattern}.
+\newblock \emph{\bibinfo{journal}{Global change biology}}
+  \textbf{\bibinfo{volume}{12}}, \bibinfo{pages}{1969--1976}
+  (\bibinfo{year}{2006}).
+
+\end{thebibliography}
