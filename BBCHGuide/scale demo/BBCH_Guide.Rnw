@@ -131,7 +131,7 @@ for(i in sp){ # i = sp[1]
       phot <- dir(i)[j]
         
         subx <- paste("\\subfigure[", paste("Stage", stages[j]),"]{
-                \\includegraphics[width = 7cm]{", paste(i, phot, sep = "/"),"}}
+                \\includegraphics[width = 7cm, resolution=35]{", paste(i, phot, sep = "/"),"}}
               \\hfill", sep = "")
         subfigs <- c(subfigs, subx)
       
@@ -153,6 +153,6 @@ for(i in sp){ # i = sp[1]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliography{BBCH}
-\bibliographystyle{naturemag}
+\bibliographystyle{plain}
 
 \end{document}
