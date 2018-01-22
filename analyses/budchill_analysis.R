@@ -11,7 +11,8 @@ options(mc.cores = parallel::detectCores())
 
 rm(list=ls())
 
-setwd("~/Documents/git/budchill/analyses")
+# setwd("~/Documents/git/budchill/analyses")
+setwd("~/Documents/git/projects/treegarden/budchill/analyses")
 source('stan/savestan.R')
 print(toload <- sort(dir("./input")[grep("Budburst Chill Data", dir('./input'))], T)[1])
 

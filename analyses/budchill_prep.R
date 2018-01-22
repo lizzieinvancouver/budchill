@@ -1,14 +1,17 @@
+## Started in 2016 by D Flynn ##
+## Lizzie started working on it in Jan 2018 ##
+
 # Budchill analyses
 library(scales)
 library(chillR)
 library(ggplot2)
 
-setwd("~/Documents/git/budchill")
+# setwd("~/Documents/git/budchill")
+setwd("~/Documents/git/projects/treegarden/budchill/analyses")
 
+d <- read.csv('..//data/Budburst Chill Datasheet.csv')
 
-d <- read.csv('data/Budburst Chill Datasheet.csv')
-
-# 
+## Step 1: Set up days since forcing for each chill time (day 1, day 2, day 3)
 d$Date <- strptime(d$Date, "%Y-%m-%d")
 day1 <- as.numeric(format(d$Date, "%j"))
 
@@ -21,7 +24,7 @@ d$day3 <- day1 - as.numeric(format(strptime("2015-02-01", "%Y-%m-%d"), "%j")) + 
 
 d$day <- ifelse(d$time == "time1", d$day1, ifelse(d$time == "time2", d$day2, d$day3))
 
-# Calculate actual chill units
+# Step 2: Calculate actual chill units
 # chill unit calcs, for each treatment
 
 chillcalc <- function(days, temp){
@@ -98,14 +101,15 @@ d$chillport = chillcalcs[match(d$Treat, chillcalcs$Treat),"chillport"]
 
 # Now summarize to days to bud burst and days to leafout
 
-bday <- lday <- fday <- nl <- vector()
+bday <- lday <- fday <- nl <- vector() # this code just builds a bunch of empty vectors
 
 for(i in levels(d$id)){ # i=levels(d$id)[602] # for each individual clipping.
   
   dx <- d[d$id == i,]
   
-  # 1. for both terminal and lateral buds, what is the max stage within a row. Identify which rows are greater or equal to the specific BBCH stage
+  # 1. for both terminal and lateral buds, what is the max stage within a row? Identify which rows are greater or equal to the specific BBCH stage
   # 2. now for that individual, find the earliest day at which that stage was reached.
+  # Lizzie understand 'nl' to mean a yes/no (1/0) on whether an individual twig made it to leafout (1 means yes, there was leafout; 0 means no leafout)
   bdax <- which(apply(dx[,c("tleaf","lleaf")], 1, max, na.rm=T) >= 3)
   if(length(bdax) < 1) bdax = NA else bdax = dx[min(bdax),'day']
   
