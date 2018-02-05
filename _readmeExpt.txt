@@ -22,10 +22,14 @@ Based on my best available knowledge:
 		- 16 January (16 days)
 		- 2 February (32 days)
 - Humidity was set at 85% and C02 is noted as 400 ppm, but I am not sure if we had it on.
-- We worked on 6 species (I believe):
+- We worked on 7 species (I believe):
 	(1) ACESAC
 	(2) BETALL
 	(3) HAMVIR
 	(4) ILEMUC
 	(5) QUERUB
 	(6) VIBCAS
+	(7) FAGGRA
+
+
+Also, a note on the BBCH scale we used: We used a numeric form that is converted in this file: Budburst Datasheet 2015-05-15.xlsx/BBCHscale tab. You call also find it in Budburst Chill Datasheet 2016-01-04.xlsx or most other of the datasheets here. 

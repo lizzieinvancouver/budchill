@@ -18,3 +18,4 @@ Overview of files in analyses/
 budchill_prep.R 
 	- This file reads in the raw experimental data and formats it.
 	- day1/day2/day3 are taking the Date column and setting it to days since start of forcing conditions, with day 1 being the no additional chill treatment, day 2 being the 1 set of additional chill and day 3 being the 2 set of additional chill
+	- It then calculates the day of bud burst, leafout and flowering day (if possible) and it flags non-leafouts at leafout stage as a 0 in nl (I think ‘nl’ means maybe number of leafouts? Anyway, 1 means it DID leafout). 

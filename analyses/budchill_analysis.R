@@ -1,15 +1,21 @@
+## Started in 2016 by D Flynn ##
+## Lizzie started working on it in Jan 2018 ##
+
 # Budburst Chilling Experiment 2016 analysis
-library(nlme)
+rm(list=ls())
+
+# library(nlme) # switching to rstanarm models by Lizzie in Jan 2018
 library(scales)
 library(arm)
 library(rstan)
-library(sjPlot)
 library(shinystan)
+# library(sjPlot)
+library(rstanarm)
 
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-rm(list=ls())
+runstan = FALSE
 
 # setwd("~/Documents/git/budchill/analyses")
 setwd("~/Documents/git/projects/treegarden/budchill/analyses")
@@ -24,21 +30,24 @@ load(file.path("input", toload))
 dx$chilltemp = as.numeric(substr(as.character(dx$chill), 6, 6))
 dx$timetreat = as.numeric(substr(as.character(dx$time), 5, 5))
 
-m1 <- lmer(bday ~ chilltemp * timetreat + (1|sp), data = dx)
+if(runstan){
+m1 <- stan_lmer(bday ~ chilltemp * timetreat + (1|sp), data = dx)
 summary(m1)
-sjp.lmer(m1, type = 'fe')
+}
 
 ########### USE THIS #################
 keepsp <- table(dx$nl, dx$sp)[2,] / table(dx$sp) >= 0.25 # all
 
-m2 <- lmer(bday ~ (chilltemp*timetreat|sp/ind), data = dx[dx$sp %in% names(keepsp)[keepsp==T],] ) # warnings.
+if(runstan){
+m2 <- stan_lmer(bday ~ (chilltemp*timetreat|sp/ind), data = dx[dx$sp %in% names(keepsp)[keepsp==TRUE],] ) # warnings.
 summary(m2)
 ranef(m2)
-sjp.lmer(m2, type = 're')
 
-m2l <- lmer(lday ~ (chilltemp*timetreat|sp), data = dx)
+m2l <- stan_lmer(lday ~ (chilltemp*timetreat|sp), data = dx)
 summary(m2l)
-sjp.lmer(m2l, type = 're')
+save(m2l, file="output/m2l.RData")
+# load("output/m2l.RData")
+}
 
 # temperature effects non linear?
 summary.aov(lm(bday ~ chilltemp * timetreat * sp, data = dx))
