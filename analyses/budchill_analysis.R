@@ -57,7 +57,24 @@ means <- aggregate(dx$bday, list(chill=dx$chilltemp, time=dx$timetreat, sp=dx$sp
 ses <- aggregate(dx$bday, list(dx$chilltemp, dx$timetreat, dx$sp), function(x) sd(x,na.rm=T)/sqrt(length(x[!is.na(x)])))
 datx <- data.frame(means, se=ses$x)
 
-ggplot(datx, aes(time, x, group = chill)) + geom_line(aes(color=chill), lwd = 2) + facet_grid(.~sp) + ylab('Day of budburst') + xlab('Chilling time')
+pdf(file="figures/budburst_bytimechill.pdf", width=14, height=6)
+ggplot(datx, aes(time, x, group = as.factor(chill), color=chill)) + geom_line(lwd = 2) +
+    geom_errorbar(aes(x=time, ymin=x-se, ymax=x+se), width=0) +
+    facet_grid(.~sp) + ylab('Day of budburst') +
+    xlab('Chilling time') +
+    scale_colour_gradient(low="red4", high = "lemonchiffon") # high = "#56B1F7"
+dev.off()
+
+# subset down to just 1 and 4 C
+datx14 <- subset(datx, chill==1|chill==4)
+
+pdf(file="figures/budburst_bytimechill_1Cand4C.pdf", width=14, height=6)
+ggplot(datx14, aes(time, x, group = as.factor(chill), color=chill)) + geom_line(lwd = 2) +
+    geom_errorbar(aes(x=time, ymin=x-se, ymax=x+se), width=0) +
+    facet_grid(.~sp) + ylab('Day of budburst') +
+    xlab('Chilling time') +
+    scale_colour_gradient(low="red4", high = "#56B1F7") 
+dev.off()
 
 m3 <- lmer(bday ~ chillport + chilltemp * timetreat + (1|sp), data = dx)
 summary(m3)
