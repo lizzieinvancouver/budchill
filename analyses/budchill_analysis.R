@@ -15,7 +15,7 @@ library(rstanarm)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-runstan = FALSE
+runstan = TRUE
 
 # setwd("~/Documents/git/budchill/analyses")
 setwd("~/Documents/git/projects/treegarden/budchill/analyses")
@@ -33,13 +33,102 @@ dx$timetreat = as.numeric(substr(as.character(dx$time), 5, 5))
 if(runstan){
 m1 <- stan_lmer(bday ~ chilltemp * timetreat + (1|sp), data = dx)
 summary(m1)
+
 }
 
-########### USE THIS #################
+########### 1 and 4 C only ###########
+dx.14 <- subset(dx, chill=="chill1" | chill=="chill4")
+
+if(runstan){
+m1.14 <- stan_lmer(bday ~ (chill*time) +(chill*time|sp), data = dx.14) # warnings.
+}
+# 1 day advance due to 4 degree temperature (compared to 1 C), 8 and 10 day advance due to longer time ...
+
+#
+sumer.m1.14 <- summary(m1.14)
+iter.m1.14 <- as.data.frame(m1.14)
+
+# manually to get right order, with intercept
+params <- c("chillchill4","timetime2","timetime3",
+               "chillchill4:timetime2","chillchill4:timetime3")
+
+col4fig <- c("mean","sd","25%","50%","75%","Rhat")
+
+meanzb.wi <- sumer.m1.14[params,col4fig]
+
+rownames(meanzb.wi) = c("Chilling at 4°C",
+                    "16 days additional chilling",
+                    "30 days additional chilling",
+                    "16 days x chilling 4°",
+                    "30 days x chilling 4°C"
+                    )
+
+speff.bb <- speff.lo <- vector()
+
+pdf(file.path("figures/m1.14.pdf"), width = 7, height = 6)
+
+par(mfrow=c(1,1), mar = c(2, 10, 2, 1))
+# One panel: budburst
+plot(seq(-15, #min(meanz[,'mean']*1.1),
+         10, #max(meanz[,'mean']*1.1),
+         length.out = nrow(meanzb.wi)), 
+     seq(1, 5*nrow(meanzb.wi), length.out = nrow(meanzb.wi)),
+     type="n",
+     xlab = "",
+     ylab = "",
+     yaxt = "n")
+
+# legend(x =-16.5, y = 2, bty="n", legend = "Budburst", text.font = 2)
+# rasterImage(bbpng, -0.25, 1, 0, 4)
+
+axis(2, at = 5*(nrow(meanzb.wi):1), labels = rownames(meanzb.wi), las = 1, cex.axis = 0.8)
+
+
+# Plot species levels for each predictor
+for(i in 1:length(unique(dx.14$sp))){
+  b.params <- iter.m1.14[!is.na(match(colnames(iter.m1.14), c(paste("b", "[", params, " sp:",
+      unique(dx$sp)[i], "]", sep=""))))]
+
+  main.params <- iter.m1.14[!is.na(match(colnames(iter.m1.14), params))]
+
+  bplusmain <- b.params
+  for(c in 1:ncol(main.params)){
+      bplusmain[c] <- b.params[c]+main.params[c]
+      }
+
+  bplusmain.quant <- sapply(bplusmain, FUN = quantile, probs = c(0.25, 0.50, 0.75))
+  
+  sp.est <- t(bplusmain.quant)
+  
+  jt <- jitter(0, factor = 40)
+
+  arrows(sp.est[,"75%"],  jt+(5*(nrow(meanzb.wi):1)-1), sp.est[,"25%"],  jt+(5*(nrow(meanzb.wi):1)-1),
+         len = 0, col = alpha("firebrick", 0.2)) 
+  
+  points(sp.est[,'50%'],
+         jt+(5*(nrow(meanzb.wi):1)-1), #[c(3:5,11:12)], # ADJUSTED for just the ranef here
+         pch = 16,
+         col = alpha("firebrick", 0.5))
+
+  speff.bb = rbind(speff.bb, t(sp.est[,1]))
+    }
+
+arrows(meanzb.wi[,"75%"], (5*(nrow(meanzb.wi):1))+0.25, meanzb.wi[,"25%"], (5*(nrow(meanzb.wi):1))+0.25,
+       len = 0, col = "black", lwd = 3)
+
+points(meanzb.wi[,'mean'],
+       (5*(nrow(meanzb.wi):1))+0.25,
+       pch = 16,
+       cex = 1,
+       col = "midnightblue")
+abline(v = 0, lty = 2)
+dev.off()
+
+########### USE THIS (Dan's analyses) #################
 keepsp <- table(dx$nl, dx$sp)[2,] / table(dx$sp) >= 0.25 # all
 
 if(runstan){
-m2 <- stan_lmer(bday ~ (chilltemp*timetreat|sp/ind), data = dx[dx$sp %in% names(keepsp)[keepsp==TRUE],] ) # warnings.
+m2 <- stan_lmer(bday ~ (chilltemp*timetreat|sp/ind), data = dx[dx$sp %in% names(keepsp)[keepsp==TRUE],] ) # note that this one does not give overall effects across species!
 summary(m2)
 ranef(m2)
 
