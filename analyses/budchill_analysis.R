@@ -41,9 +41,13 @@ dx.14 <- subset(dx, chill=="chill1" | chill=="chill4")
 
 if(runstan){
 m1.14 <- stan_lmer(bday ~ (chill*time) +(chill*time|sp), data = dx.14) # warnings.
+save(m1.14, file="output/m1.14bb.Rdata")
 }
 # 1 day advance due to 4 degree temperature (compared to 1 C), 8 and 10 day advance due to longer time ...
 
+if(!runstan){
+load("output/m1.14bb.Rdata")
+}
 #
 sumer.m1.14 <- summary(m1.14)
 iter.m1.14 <- as.data.frame(m1.14)
@@ -59,22 +63,22 @@ meanzb.wi <- sumer.m1.14[params,col4fig]
 rownames(meanzb.wi) = c("Chilling at 4°C",
                     "16 days additional chilling",
                     "30 days additional chilling",
-                    "16 days x chilling 4°",
+                    "16 days x chilling 4°C",
                     "30 days x chilling 4°C"
                     )
 
 speff.bb <- speff.lo <- vector()
 
-pdf(file.path("figures/m1.14.pdf"), width = 7, height = 6)
+pdf(file.path("figures/m1and14.pdf"), width = 7, height = 6)
 
-par(mfrow=c(1,1), mar = c(2, 10, 2, 1))
+par(mfrow=c(1,1), mar = c(6, 10, 2, 1))
 # One panel: budburst
 plot(seq(-15, #min(meanz[,'mean']*1.1),
          10, #max(meanz[,'mean']*1.1),
          length.out = nrow(meanzb.wi)), 
      seq(1, 5*nrow(meanzb.wi), length.out = nrow(meanzb.wi)),
      type="n",
-     xlab = "",
+     xlab = "Model estimate change in day of budburst",
      ylab = "",
      yaxt = "n")
 
