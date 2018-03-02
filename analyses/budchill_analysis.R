@@ -36,8 +36,18 @@ summary(m1)
 
 }
 
-########### 1 and 4 C only ###########
+########### No chill and 1 and 4 C only ###########
 dx.14 <- subset(dx, chill=="chill1" | chill=="chill4")
+
+## Recoding by Lizzie
+# If none of the chilling happened until 1 January, then the chilltemp coding is INCORRECT, because there is no chilltemp to experience in time1 #
+## One way to fix this (shown below) results in the same model estimates as best I can tell. 
+if(FALSE){
+dx.14$chilltemp[dx.14$timetreat=="1"] <- 0
+dx.14$chilltemp <- as.factor(dx.14$chilltemp)
+dx.14$timetreat <- as.factor(dx.14$timetreat)
+}
+# Note that my old code where I tried to overcode the factor ended up in overcoding too much -- be careful with factors....
 
 if(runstan){
 m1.14 <- stan_lmer(bday ~ (chill*time) +(chill*time|sp), data = dx.14) # warnings.
