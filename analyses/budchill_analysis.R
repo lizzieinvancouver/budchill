@@ -15,7 +15,7 @@ library(rstanarm)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-runstan = TRUE
+runstan = FALSE
 
 # setwd("~/Documents/git/budchill/analyses")
 setwd("~/Documents/git/projects/treegarden/budchill/analyses")
@@ -62,9 +62,9 @@ meanzb.wi <- sumer.m1.14[params,col4fig]
 
 rownames(meanzb.wi) = c("Chilling at 4°C",
                     "16 days additional chilling",
-                    "30 days additional chilling",
+                    "32 days additional chilling",
                     "16 days x chilling 4°C",
-                    "30 days x chilling 4°C"
+                    "32 days x chilling 4°C"
                     )
 
 speff.bb <- speff.lo <- vector()
@@ -127,6 +127,9 @@ points(meanzb.wi[,'mean'],
        col = "midnightblue")
 abline(v = 0, lty = 2)
 dev.off()
+
+
+
 
 ########### USE THIS (Dan's analyses) #################
 keepsp <- table(dx$nl, dx$sp)[2,] / table(dx$sp) >= 0.25 # all
