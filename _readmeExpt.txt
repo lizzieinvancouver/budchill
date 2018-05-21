@@ -33,3 +33,30 @@ Based on my best available knowledge:
 
 
 Also, a note on the BBCH scale we used: We used a numeric form that is converted in this file: Budburst Datasheet 2015-05-15.xlsx/BBCHscale tab. You call also find it in Budburst Chill Datasheet 2016-01-04.xlsx or most other of the datasheets here. 
+
+<><><><><><><><><><><><><><><><><><><><>
+Chill portions & the experimental design
+<><><><><><><><><><><><><><><><><><><><>
+Dan designed the experiment so that we obtained the same chill portions under different temperatures. Based on budchill_prep.R I think it goes like this:
+
+time 1 has no chilling, so all treatments are the same
+time 2: 
+	1 C: 45.5 cp (chill portions)
+	2 C: 49.8 cp
+	4 C: 51.4 cp
+	8 C: 53.5 cp
+time 3: 
+	1 C: 51.8 cp 
+	2 C: 60.3 cp
+	4 C: 63.0 cp
+	8 C: 66.7 cp
+
+In the code we save chill portions from the Dynamic model (note I did find he was originally pulling chilling hours, but I think this was a mistake as his natural and storage chilling to me look to be in chill portions). Try ?chilling for more beyond this:
+
+Chill Portions are calculated according to Fishman et al. (1987a,b). More honestly, they are calculated according to an Excel sheet produced by Amnon Erez and colleagues, which converts the complex equations in the Fishman papers into relatively simple Excel functions. These were translated into R. References to papers that include the full functions are given below. Growing Degree Hours are calculated according to Anderson et al. (1986), using the default values they suggest.
+
+Here's some examples (using Dan's bud chill prep code) by Lizzie:
+
+16 d at 2 C: 9.6 chill portions (cp); 384 chill hours (ch)
+16 d at 4 C: 11.1 cp; 384 ch
+16 d at 8 C: 13.2 cp; 384 ch

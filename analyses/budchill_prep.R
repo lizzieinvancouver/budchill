@@ -44,7 +44,7 @@ numdays <- vector()
 for(i in chilltreat){
   for(j in timetreat){
     
-    chillportions <- c(chillportions, as.numeric(chillcalc(j, i)[6]))
+    chillportions <- c(chillportions, as.numeric(chillcalc(j, i)[8])) # Lizziechanged this, it previously extract Chilling_hours ([6]), but [8] extracts Chill_portions, which looks to be Dan Flynn's calculations for natural and storage chill below
     numdays <- c(numdays, j)
   }
 }
@@ -213,4 +213,16 @@ ggplot(dx, aes(jitter(chillport, 3), jitter(bday, 3), color = sp)) + geom_point(
 
 dev.print(pdf, "figures/Budburst x Chill Port.pdf", width = 6, height = 5)
 system(paste("open 'figures/Budburst x Chill Port.pdf' -a /Applications/Preview.app", sep=""))
+
+ggplot(dx, aes(jitter(chillport, 3), jitter(bday, 3), color = time)) +
+    geom_point(aes(color = time, shape=chill)) +
+    xlab("Chill Portions") + ylab("Day of Budburst") +
+    facet_wrap(~sp, nrow=6)
+
+dev.print(pdf, "figures/Budburst x Chill Port by sp.pdf", width = 7, height = 7)
+system(paste("open 'figures/Budburst x Chill Port by sp.pdf' -a /Applications/Preview.app", sep=""))
+
+
+## How experiment and chill portions work
+table(dx$chillport, dx$chill, dx$time)
 
