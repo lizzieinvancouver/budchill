@@ -11,6 +11,7 @@ library(rstan)
 library(shinystan)
 # library(sjPlot)
 library(rstanarm)
+library(RColorBrewer)
 
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
@@ -34,7 +35,108 @@ if(runstan){
 m1 <- stan_lmer(bday ~ chilltemp * timetreat + (1|sp), data = dx)
 summary(m1)
 
+m1.all <- stan_lmer(bday ~ (chill*time) +(chill*time|sp), data = dx)
+summary(m1.all)
+save(m1.all, file="output/m1.allbb.Rdata")
+
 }
+
+if(!runstan){
+load("output/m1.allbb.Rdata")
+}
+
+sumer.m1.all <- summary(m1.all)
+iter.m1.all <- as.data.frame(m1.all)
+
+# manually to get right order, with intercept
+params <- c("chillchill2", "chillchill4", "chillchill8","timetime2", "timetime3",
+    "chillchill2:timetime2", "chillchill4:timetime2", "chillchill8:timetime2", 
+    "chillchill2:timetime3", "chillchill4:timetime3", "chillchill8:timetime3")
+
+col4fig <- c("mean","sd","25%","50%","75%","Rhat")
+
+meanzb.wi <- sumer.m1.all[params,col4fig]
+
+rownames(meanzb.wi) = c("Chilling at 2°C",
+                    "Chilling at 4°C",
+                    "Chilling at 8°C",
+                    "16 days additional chilling",
+                    "32 days additional chilling",
+                    "16 days x chilling 2°C",
+                    "16 days x chilling 4°C",
+                    "16 days x chilling 8°C",
+                    "32 days x chilling 2°C",
+                    "32 days x chilling 4°C",
+                    "32 days x chilling 8°C"
+                    )
+
+my.pal <- brewer.pal(n = 8, name = "Dark2")
+
+speff.bb <- speff.lo <- vector()
+
+pdf(file.path("figures/m1.all.pdf"), width = 7, height = 8)
+
+par(mfrow=c(1,1), mar = c(6, 10, 2, 1))
+# One panel: budburst
+plot(seq(-15, #min(meanz[,'mean']*1.1),
+         10, #max(meanz[,'mean']*1.1),
+         length.out = nrow(meanzb.wi)), 
+     seq(1, 5*nrow(meanzb.wi), length.out = nrow(meanzb.wi)),
+     type="n",
+     xlab = "Model estimate change in day of budburst",
+     ylab = "",
+     yaxt = "n")
+
+# legend(x =-16.5, y = 2, bty="n", legend = "Budburst", text.font = 2)
+# rasterImage(bbpng, -0.25, 1, 0, 4)
+
+axis(2, at = 5*(nrow(meanzb.wi):1), labels = rownames(meanzb.wi), las = 1, cex.axis = 0.8)
+
+
+# Plot species levels for each predictor
+for(i in 1:length(unique(dx$sp))){
+  b.params <- iter.m1.all[!is.na(match(colnames(iter.m1.all), c(paste("b", "[", params, " sp:",
+      unique(dx$sp)[i], "]", sep=""))))]
+
+  main.params <- iter.m1.all[!is.na(match(colnames(iter.m1.all), params))]
+
+  bplusmain <- b.params
+  for(c in 1:ncol(main.params)){
+      bplusmain[c] <- b.params[c]+main.params[c]
+      }
+
+  bplusmain.quant <- sapply(bplusmain, FUN = quantile, probs = c(0.25, 0.50, 0.75))
+  
+  sp.est <- t(bplusmain.quant)
+  
+  jt <- jitter(0, factor = 40)
+
+  arrows(sp.est[,"75%"],  jt+(5*(nrow(meanzb.wi):1)-1), sp.est[,"25%"],  jt+(5*(nrow(meanzb.wi):1)-1),
+         len = 0, col = alpha(my.pal[i], 0.2)) 
+  
+  points(sp.est[,'50%'],
+         jt+(5*(nrow(meanzb.wi):1)-1), #[c(3:5,11:12)], # ADJUSTED for just the ranef here
+         pch = 16,
+         col = alpha(my.pal[i], 0.5))
+
+  speff.bb = rbind(speff.bb, t(sp.est[,1]))
+    }
+
+arrows(meanzb.wi[,"75%"], (5*(nrow(meanzb.wi):1))+0.25, meanzb.wi[,"25%"], (5*(nrow(meanzb.wi):1))+0.25,
+       len = 0, col = "black", lwd = 3)
+
+points(meanzb.wi[,'mean'],
+       (5*(nrow(meanzb.wi):1))+0.25,
+       pch = 16,
+       cex = 1,
+       col = "midnightblue")
+abline(v = 0, lty = 2)
+
+legend("topleft", legend=unique(dx$sp), col=alpha(my.pal[1:7], 0.5), pch=16, bty="n", cex=0.7)
+dev.off()
+
+
+
 
 ########### No chill and 1 and 4 C only ###########
 dx.14 <- subset(dx, chill=="chill1" | chill=="chill4")
@@ -137,9 +239,6 @@ points(meanzb.wi[,'mean'],
        col = "midnightblue")
 abline(v = 0, lty = 2)
 dev.off()
-
-
-
 
 ########### USE THIS (Dan's analyses) #################
 keepsp <- table(dx$nl, dx$sp)[2,] / table(dx$sp) >= 0.25 # all
