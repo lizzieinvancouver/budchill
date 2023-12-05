@@ -25,6 +25,9 @@ print(toload <- sort(dir("./input")[grep("Budburst Chill Data", dir('./input'))]
 
 load(file.path("input", toload))
 
+# write out these data for J Auerbach on 4 December 2023
+write.csv(dx, "output/dxforJAuerbach_chillexp.csv", row.names=FALSE)
+
 # Initial analysis: by experimental treatment
 # convert chill and time to numerics for ordered analysis
 
